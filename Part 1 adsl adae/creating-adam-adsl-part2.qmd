@@ -5,15 +5,6 @@ date: "2023-05-15"
 
 In [Part 1](https://posit.co/blog/creating-adsl-with-the-pharmaverse-part-1/), we set up our project, loaded metadata using metacore, and used it to automate dataset creation. After creating and coding a few variables, we saw that a few required calculations.
 
-```{r}
-#| label: part1
-#| message: false
-#| include: false
-#| warning: false
-# Run first three steps of the workflow
-source("/cloud/project/scripts/creating-adam-adsl-part1.R", 
-       local = knitr::knit_global())
-```
 
 ```{r}
 #| error: true
