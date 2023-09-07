@@ -88,7 +88,7 @@ We begin by creating columns for the baseline characteristics for height and wei
 adsl_bl <- pre_adsl %>%
   derive_vars_transposed(
     select(vs, USUBJID, VSTESTCD, VSSTRESN, VSBLFL), # Dataset to transpose and merge onto
-    by_vars = vars(USUBJID), # Merge keys
+    by_vars = exprs(USUBJID), # Merge keys
     key = VSTESTCD, # Names of transposed variables 
     value = VSSTRESN, # Values of transposed variables
     filter = VSTESTCD %in% c("HEIGHT", "WEIGHT") & VSBLFL == "Y" # Restrict records to just height and weight
@@ -139,17 +139,17 @@ We also want the last treatment date, so we pipe in another `derive_vars_merged(
 adsl_ex <- adsl_bl %>%
   derive_vars_merged(
     dataset_add = ex_dt,
-    by_vars = vars(STUDYID, USUBJID), # Merge to single record
-    order = vars(EXSTDT, EXSEQ),
-    new_vars = vars(TRTSDT = EXSTDT),
+    by_vars = exprs(STUDYID, USUBJID), # Merge to single record
+    order = exprs(EXSTDT, EXSEQ),
+    new_vars = exprs(TRTSDT = EXSTDT),
     mode = "first",
     filter_add = EXDOSE > 0 | (EXDOSE == 0 & str_detect(EXTRT, "Placebo"))
   ) %>%
   derive_vars_merged(
     dataset_add = ex_dt,
-    by_vars = vars(STUDYID, USUBJID),
-    order = vars(EXENDT, EXSEQ),
-    new_vars = vars(TRTEDT = EXENDT),
+    by_vars = exprs(STUDYID, USUBJID),
+    order = exprs(EXENDT, EXSEQ),
+    new_vars = exprs(TRTEDT = EXENDT),
     mode = "last",
     filter_add = EXDOSE > 0 | (EXDOSE == 0 & str_detect(EXTRT, "Placebo"))
   )
@@ -166,13 +166,13 @@ Like before, we can pipe our modified dataset and run `derive_var_merged_exist_f
 adsl_saff <- adsl_ex %>%
   derive_var_merged_exist_flag(
     dataset_add = ex,
-    by_vars = vars(STUDYID, USUBJID),
+    by_vars = exprs(STUDYID, USUBJID),
     new_var = SAFFL,
     condition = (EXDOSE > 0 | (EXDOSE == 0 & str_detect(EXTRT, "Placebo")))
   ) %>%
   derive_var_merged_exist_flag(
     dataset_add = sv,
-    by_vars = vars(STUDYID, USUBJID),
+    by_vars = exprs(STUDYID, USUBJID),
     new_var = MITTFL,
     condition = (VISITDY >= 56)
   ) %>%
@@ -193,7 +193,7 @@ The `traceability_vars` parameter adds context to the derivations. It defines th
 ex_start_src <- date_source(
   dataset_name = "ex",
   date = EXSTDT,
-  traceability_vars = vars(
+  traceability_vars = exprs(
     LALVDOM = "EX",
     LALVSEQ = EXSEQ,
     LALVVAR = "EXSTDTC"
@@ -204,7 +204,7 @@ ex_start_src <- date_source(
 ex_end_src <- date_source(
   dataset_name = "ex",
   date = EXENDT,
-  traceability_vars = vars(
+  traceability_vars = exprs(
     LALVDOM = "EX",
     LALVSEQ = EXSEQ,
     LALVVAR = "EXENDTC"
@@ -223,7 +223,7 @@ ae_dt <- ae %>%
 ae_start_src <- date_source(
   dataset_name = "ae",
   date = AESTDT,
-  traceability_vars = vars(
+  traceability_vars = exprs(
     LALVDOM = "AE",
     LALVSEQ = AESEQ,
     LALVVAR = "AESTDTC"
@@ -233,7 +233,7 @@ ae_start_src <- date_source(
 ae_end_src <- date_source(
   dataset_name = "ae",
   date = AEENDT,
-  traceability_vars = vars(
+  traceability_vars = exprs(
     LALVDOM = "AE",
     LALVSEQ = AESEQ,
     LALVVAR = "AENTDTC"
@@ -248,7 +248,7 @@ Finally, we use ADSL as our last source.
 adsl_dt_src <- date_source(
   dataset_name = "adsl",
   date = TRTEDT,
-  traceability_vars = vars(
+  traceability_vars = exprs(
     LALVDOM = "ADSL",
     LALVSEQ = NA,
     LALVVAR = "TRTEDT"

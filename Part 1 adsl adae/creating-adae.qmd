@@ -30,9 +30,22 @@ library(xportr)    # CRAN v0.1.0
 data("admiral_ae")
 data("admiral_adsl")
 
-adsl <- read_xpt("~/Intro-R-for-Drug-Development/Part 1 adsl adae/adsl.xpt")
+target_file <- "adsl.xpt"
 
-# ae <- read_xpt("~/Intro-R-for-Drug-Development/Part 1 adsl adae/ae.xpt")
+dir_root <- rprojroot::find_root(rprojroot::is_git_root, ".")
+
+full_file <- fs::path(dir_root, "Part 1 adsl adae", target_file)
+if (!fs::file_exists(full_file)) {
+  # try the root directory
+  full_file <- fs::path(dir_root, target_file)
+  if (!fs::file_exists(full_file)) {
+    stop("adsl.xpt file does not exist - have you created it yet? Run 'creating-adsl.R'")
+  }
+}
+
+adsl <- read_xpt(full_file)
+
+# ae <- read_xpt(fs::path(dir_root, "Part 1 adsl adae", "ae.xpt"))
 
 data("ex_single")
 
